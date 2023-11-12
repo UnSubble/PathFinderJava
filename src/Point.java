@@ -24,6 +24,10 @@ public class Point {
 	public void setY(int y) {
 		this.y = y;
 	}
+	
+	public int distance(Point other) {
+		return Math.abs(x - other.x) + Math.abs(y - other.y);
+	}
 
 	@Override
 	public int hashCode() {
@@ -41,8 +45,11 @@ public class Point {
 		Point other = (Point) obj;
 		return x == other.x && y == other.y;
 	}
-	
-	public int distance(Point other) {
-		return Math.abs(x - other.x) + Math.abs(y - other.y);
+
+	@Override
+	public String toString() {
+		return "Point: [x=" + x + ",y=" + y + "]";
 	}
+	
+	
 }
