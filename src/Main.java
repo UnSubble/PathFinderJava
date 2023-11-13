@@ -2,14 +2,14 @@
 public class Main {
 
 	public static void main(String[] args) {
-		int n = 8;
-		int[][] s = new int[n][n];
-		int[] a = new int[n];
-		for (int i = 0; i < n; i++) {
-			s[i] = a;
+		int[][] s = new int[5][8];
+		
+		for (int i = 0; i < 5; i++) {
+			s[i] = new int[5];
 		}
+		
 		PathFinder path = new PathFinder(s);
-		System.out.println(path.findShortestWay(new Point(0,0), new Point(n - 1, n - 1)));
+		System.out.println(path.findShortestWay(new Point(4,4), new Point(0,0)));
 	}
 
 }

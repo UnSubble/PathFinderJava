@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class PathFinder {
 	private int[][] map;
@@ -20,7 +22,7 @@ public class PathFinder {
 	
 	public void changeMap(int[][] newMap) {
 		this.map = newMap;
-		pathLength = 3; // Math.max(newMap.length, newMap[0].length) / 2 + 1;
+		pathLength = 3;
 		clear();
 	}
 	
@@ -48,14 +50,14 @@ public class PathFinder {
 		next(list, new Point(p.getX(), p.getY() - 1), count + 1, end);	
 	}
 	
-	private List<List<Point>> getWays(Point start, Point end) {
+	private List<List<Point>> getWay(Point start, Point end) {
 		List<List<Point>> pathList = new ArrayList<>();
 		findWays(new ArrayList<>(List.of(start)), start, 0, end);
-		int n = 5;
-		while (n-- > 0) {
+		while (pathList.isEmpty()) {
+			Set<Point> lastPoints = new HashSet<>();
 			List<List<Point>> temp = new ArrayList<>(ways);
 			ways.clear();
-			pathLength = Math.min(3, temp.size());
+			pathLength = Math.min(4, temp.size());
 			if (pathLength == 0)
 				break;
 			int distance = start.distance(end);;	
@@ -63,6 +65,10 @@ public class PathFinder {
 				distance = Math.min(distance, t.get(t.size() - 1).distance(end));
 			for (List<Point> t : temp) {
 				Point s = t.get(t.size() - 1);
+				if (lastPoints.contains(t.get(t.size() - 1)))
+					continue;
+				else
+					lastPoints.add(t.get(t.size() - 1));
 				if (s.distance(end) == distance) {
 					if (s.distance(end) == 0) {
 						pathList.add(t);
@@ -80,7 +86,7 @@ public class PathFinder {
 		List<List<Point>> l = Collections.emptyList();
 		if (ways.isEmpty()) {
 			clear();
-			l = getWays(start, end);
+			l = getWay(start, end);
 		}
 		return !l.isEmpty();
 	}
@@ -89,7 +95,7 @@ public class PathFinder {
 		List<List<Point>> l = Collections.emptyList();
 		if (ways.isEmpty()) {
 			clear();
-			l = getWays(start, end);
+			l = getWay(start, end);
 		}
 		return l.isEmpty() ? Collections.emptyList() : l.get(0);
 	}
