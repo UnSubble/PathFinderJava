@@ -22,7 +22,7 @@ public class PathFinder {
 	
 	public void changeMap(int[][] newMap) {
 		this.map = newMap;
-		pathLength = 4;
+		pathLength = Math.min(newMap.length, newMap[0].length);
 		clear();
 	}
 	
@@ -48,10 +48,17 @@ public class PathFinder {
 		next(path, new Point(p.getX() - 1, p.getY()), count + 1, end);
 		next(path, new Point(p.getX(), p.getY() + 1), count + 1, end);
 		next(path, new Point(p.getX(), p.getY() - 1), count + 1, end);	
+		
+		if (count == 0)
+			ways.add(path);
 	}
 	
-	private List<List<Point>> getWay(Point start, Point end) {
+	private List<List<Point>> getWay(Point start, Point end) { 
 		List<List<Point>> pathList = new ArrayList<>();
+		if (start.equals(end)) {
+			pathList.add(new ArrayList<>(List.of(start)));
+			return pathList;
+		}	
 		findWays(new ArrayList<>(List.of(start)), start, 0, end);
 		int length = 0;
 		while (pathList.isEmpty()) {

@@ -2,18 +2,10 @@
 public class Main {
 
 	public static void main(String[] args) {
-		int[][] s = {
-				{0,1,1,0,1,1,0},
-				{0,0,0,0,1,0,0},
-				{0,1,1,1,0,0,1},
-				{0,0,0,0,0,1,0},
-				{0,0,0,0,0,0,0},
-				{0,0,0,0,0,0,0},
-				{0,0,0,0,0,0,0}
-		};	
+		int[][] s = new int[2][2];
 		
 		PathFinder path = new PathFinder(s);
-		System.out.println(path.findShortestWay(new Point(0,0), new Point(0,6)));
+		System.out.println(path.findShortestWay(new Point(0,0), new Point(1,1)));
 	}
 
 }
