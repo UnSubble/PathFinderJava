@@ -7,7 +7,7 @@ import java.util.Set;
 public class PathFinder {
 	private int[][] map;
 	private int pathLength;
-	private List<List<Point>> ways;
+	private Set<List<Point>> ways;
 	
 	public PathFinder(int[][] map) {
 		changeMap(map);
@@ -15,7 +15,7 @@ public class PathFinder {
 	
 	private void clear() {
 		if (ways == null)
-			ways = new ArrayList<>();
+			ways = new HashSet<>();
 		else 
 			ways.clear();
 	}
@@ -27,27 +27,27 @@ public class PathFinder {
 	}
 	
 	private boolean check(Point point) {
-		return point.getX() > -1 && point.getX() < map[0].length && point.getY() > -1 && 
+		return point.getX() > -1 && point.getX() < map.length && point.getY() > -1 && 
 				point.getY() < map[0].length && map[point.getX()][point.getY()] == 0;
 	}
 	
-	private void next(List<Point> list, Point p, int count, Point end) {
-		if (check(p) && !list.contains(p)) {
-			List<Point> l = new ArrayList<>(list);
-			l.add(p);
-			findWays(l, p, count, end);
+	private void next(List<Point> path, Point point, int count, Point end) {
+		if (check(point) && !path.contains(point)) {
+			List<Point> newPath = new ArrayList<>(path);
+			newPath.add(point);
+			findWays(newPath, point, count, end);
 		}
 	}
 	
-	private void findWays(List<Point> list, Point p, int count, Point end) {
-		if (count == pathLength || list.get(list.size() - 1).equals(end)) {
-			ways.add(list);			
+	private void findWays(List<Point> path, Point p, int count, Point end) {
+		if (count == pathLength || path.get(path.size() - 1).equals(end)) {
+			ways.add(path);	
 			return;
 		}
-		next(list, new Point(p.getX() + 1, p.getY()), count + 1, end);	
-		next(list, new Point(p.getX() - 1, p.getY()), count + 1, end);
-		next(list, new Point(p.getX(), p.getY() + 1), count + 1, end);
-		next(list, new Point(p.getX(), p.getY() - 1), count + 1, end);	
+		next(path, new Point(p.getX() + 1, p.getY()), count + 1, end);	
+		next(path, new Point(p.getX() - 1, p.getY()), count + 1, end);
+		next(path, new Point(p.getX(), p.getY() + 1), count + 1, end);
+		next(path, new Point(p.getX(), p.getY() - 1), count + 1, end);	
 	}
 	
 	private List<List<Point>> getWay(Point start, Point end) {
@@ -55,48 +55,47 @@ public class PathFinder {
 		findWays(new ArrayList<>(List.of(start)), start, 0, end);
 		while (pathList.isEmpty()) {
 			Set<Point> lastPoints = new HashSet<>();
-			List<List<Point>> temp = new ArrayList<>(ways);
+			Set<List<Point>> tempWays = new HashSet<>(ways);
 			ways.clear();
-			pathLength = Math.min(4, temp.size());
+			pathLength = Math.min(4, tempWays.size());
 			if (pathLength == 0)
 				break;
 			int distance = start.distance(end);;	
-			for (List<Point> t : temp) 
-				distance = Math.min(distance, t.get(t.size() - 1).distance(end));
-			for (List<Point> t : temp) {
-				Point s = t.get(t.size() - 1);
-				if (lastPoints.contains(t.get(t.size() - 1)))
-					continue;
+			for (List<Point> tempPath : tempWays) {
+				distance = Math.min(distance, tempPath.get(tempPath.size() - 1).distance(end));
+				if (tempPath.get(tempPath.size() - 1).distance(end) == 0 && tempPath.size() < pathLength) {	
+					pathList.add(tempPath);
+					break;
+				}
+			}
+			for (List<Point> tempPath : tempWays) {
+				Point lastPoint = tempPath.get(tempPath.size() - 1);				
+				if (lastPoints.contains(lastPoint)) 	
+					continue;										
 				else
-					lastPoints.add(t.get(t.size() - 1));
-				if (s.distance(end) == distance) {
-					if (s.distance(end) == 0) {
-						pathList.add(t);
-						continue;
+					lastPoints.add(lastPoint);
+				if (lastPoint.distance(end) == distance) {
+					if (lastPoint.distance(end) == 0) {
+						pathList.add(tempPath);
+						break;
 					}	
-					findWays(t, t.get(t.size() - 1), 0, end);
+					findWays(tempPath, lastPoint, 0, end);
 				} else
-					ways.remove(t);
+					ways.remove(tempPath);
 			}
 		}
 		return pathList;
 	}
 	
 	public boolean isReachable(Point start, Point end) {
-		List<List<Point>> l = Collections.emptyList();
-		if (ways.isEmpty()) {
-			clear();
-			l = getWay(start, end);
-		}
+		clear();
+		List<List<Point>> l = getWay(start, end);
 		return !l.isEmpty();
 	}
 	
-	public List<Point> findShortestWay(Point start, Point end) {
-		List<List<Point>> l = Collections.emptyList();
-		if (ways.isEmpty()) {
-			clear();
-			l = getWay(start, end);
-		}
+	public List<Point> findShortestWay(Point start, Point end) { 
+		clear();
+		List<List<Point>> l = getWay(start, end);
 		return l.isEmpty() ? Collections.emptyList() : l.get(0);
 	}
 
