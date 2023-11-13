@@ -22,7 +22,7 @@ public class PathFinder {
 	
 	public void changeMap(int[][] newMap) {
 		this.map = newMap;
-		pathLength = 3;
+		pathLength = 4;
 		clear();
 	}
 	
@@ -53,19 +53,27 @@ public class PathFinder {
 	private List<List<Point>> getWay(Point start, Point end) {
 		List<List<Point>> pathList = new ArrayList<>();
 		findWays(new ArrayList<>(List.of(start)), start, 0, end);
+		int length = 0;
 		while (pathList.isEmpty()) {
 			Set<Point> lastPoints = new HashSet<>();
-			Set<List<Point>> tempWays = new HashSet<>(ways);
+			List<List<Point>> tempWays = new ArrayList<>(ways);
 			ways.clear();
 			pathLength = Math.min(4, tempWays.size());
 			if (pathLength == 0)
 				break;
-			int distance = start.distance(end);;	
-			for (List<Point> tempPath : tempWays) {
-				distance = Math.min(distance, tempPath.get(tempPath.size() - 1).distance(end));
-				if (tempPath.get(tempPath.size() - 1).distance(end) == 0 && tempPath.size() < pathLength) {	
-					pathList.add(tempPath);
-					break;
+			int distance = start.distance(end);;
+			
+			length += pathLength;
+			for (int i = 0; i < tempWays.size(); i++) {
+				List<Point> tempPath = tempWays.get(i);
+				distance = Math.max(distance, tempPath.get(tempPath.size() - 1).distance(end));
+				if (tempPath.size() < length) {
+					if (tempPath.get(tempPath.size() - 1).distance(end) == 0) {
+						pathList.add(tempPath);
+						break;
+					} else {
+						tempWays.remove(i--);
+					}
 				}
 			}
 			for (List<Point> tempPath : tempWays) {
@@ -74,7 +82,7 @@ public class PathFinder {
 					continue;										
 				else
 					lastPoints.add(lastPoint);
-				if (lastPoint.distance(end) == distance) {
+				if (lastPoint.distance(end) != distance) {
 					if (lastPoint.distance(end) == 0) {
 						pathList.add(tempPath);
 						break;
@@ -88,9 +96,7 @@ public class PathFinder {
 	}
 	
 	public boolean isReachable(Point start, Point end) {
-		clear();
-		List<List<Point>> l = getWay(start, end);
-		return !l.isEmpty();
+		return findShortestWay(start, end).isEmpty();
 	}
 	
 	public List<Point> findShortestWay(Point start, Point end) { 
